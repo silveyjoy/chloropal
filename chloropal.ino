@@ -19,12 +19,12 @@ ESP8266WiFiMulti WiFiMulti;
 #define yellowLED   2   //D4
 
 //lcd pins
-#define screenSCE   16  //D0
-#define screenRST   12  //D6
-#define screenDC    4   //D2
-#define screenMOSI  13  //D7
-#define screenSCL   5   //D1
-#define screenLED   14  //D5
+#define lcdSCE   16  //D0
+#define lcdRST   12  //D6
+#define lcdDC    4   //D2
+#define lcdMOSI  13  //D7
+#define lcdSCL   5   //D1
+#define lcdLED   14  //D5
 
 #define LCD_C     LOW
 #define LCD_D     HIGH
@@ -73,33 +73,27 @@ char lcdArray[6][4][21] = {
 
 
 //lcd functions
-void LcdInitialise(void) {
-  pinMode(screenSCE, OUTPUT);
-  pinMode(screenRST, OUTPUT);
-  pinMode(screenDC, OUTPUT);
-  pinMode(screenMOSI, OUTPUT);
-  pinMode(screenSCL, OUTPUT);
-  digitalWrite(screenRST, LOW);
-  digitalWrite(screenRST, HIGH);
-  LcdWrite(LCD_C, 0x21 );  // LCD Extended Commands.
-  LcdWrite(LCD_C, 0xB1 );  // Set LCD Vop (Contrast). 
-  LcdWrite(LCD_C, 0x04 );  // Set Temp coefficent. //0x04
-  LcdWrite(LCD_C, 0x14 );  // LCD bias mode 1:48. //0x13
-  LcdWrite(LCD_C, 0x20 );  // LCD Basic Commands
-  LcdWrite(LCD_C, 0x0C );  // LCD in normal mode.
+void lcdInitialize(void) {
+  pinMode(lcdSCE, OUTPUT);
+  pinMode(lcdRST, OUTPUT);
+  pinMode(lcdDC, OUTPUT);
+  pinMode(lcdMOSI, OUTPUT);
+  pinMode(lcdSCL, OUTPUT);
+  digitalWrite(lcdRST, LOW);
+  digitalWrite(lcdRST, HIGH);
+  lcdWrite(LCD_C, 0x21 );  // LCD Extended Commands.
+  lcdWrite(LCD_C, 0xB1 );  // Set LCD Vop (Contrast). 
+  lcdWrite(LCD_C, 0x04 );  // Set Temp coefficent. //0x04
+  lcdWrite(LCD_C, 0x14 );  // LCD bias mode 1:48. //0x13
+  lcdWrite(LCD_C, 0x20 );  // LCD Basic Commands
+  lcdWrite(LCD_C, 0x0C );  // LCD in normal mode.
 }
 
-void LcdWrite(byte dc, byte data) {
-  digitalWrite(screenDC, dc);
-  digitalWrite(screenSCE, LOW);
-  shiftOut(screenMOSI, screenSCL, MSBFIRST, data);
-  digitalWrite(screenSCE, HIGH);
-}
-
-void LcdClear(void) {
-  for (int index = 0; index < LCD_X * LCD_Y / 8; index++) {
-    LcdWrite(LCD_D, 0x00);
-  }
+void lcdWrite(byte dc, byte data) {
+  digitalWrite(lcdDC, dc);
+  digitalWrite(lcdSCE, LOW);
+  shiftOut(lcdMOSI, lcdSCL, MSBFIRST, data);
+  digitalWrite(lcdSCE, HIGH);
 }
 
 void lcdArrayClear(char displayValues[6][4][21]) {
@@ -127,7 +121,7 @@ void lcdUpdate(char displayValues[6][4][21]) {
   for (row = 0; row < 6; row++){
     for (col = 0; col < 4; col++) {
       for (byteValue = 0; byteValue < 21; byteValue++) {
-        LcdWrite(LCD_D, displayValues[row][col][byteValue]);
+        lcdWrite(LCD_D, displayValues[row][col][byteValue]);
       };
     };
   };
@@ -172,9 +166,9 @@ void setup() {
 //  WiFiMulti.addAP("NETWORK NAME", "PASSWORD");
 
   //lcd setup
-  LcdInitialise();
-  LcdClear();
-  analogWrite(screenLED, 200);
+  lcdInitialize();
+  lcdUpdate(lcdArray);
+  analogWrite(lcdLED, 200);
 }
         
 void loop() {
@@ -200,4 +194,5 @@ void loop() {
 
   lcdUpdate(lcdArray);
   lcdArrayClear(lcdArray);
+  
 }
